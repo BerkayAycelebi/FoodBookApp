@@ -2,6 +2,7 @@ package com.example.foodrecipeapp
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -15,7 +16,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_recipe.*
+import java.io.ByteArrayOutputStream
 import java.lang.Exception
 
 
@@ -38,7 +41,7 @@ class RecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         button.setOnClickListener {
-            save()
+            save(it)
         }
 
         imageView.setOnClickListener {
@@ -46,13 +49,40 @@ class RecipeFragment : Fragment() {
         }
     }
 
-        fun save()
+        fun save(view: View)
         {
             val foodname=foodNameText.text.toString()
             val foodIngredient=foodIngredientText.text.toString()
             if(selectedBitmap!=null)
             {
                 val copressedBitmap=compressBitmap(selectedBitmap!!,300,)
+                val outputStream=ByteArrayOutputStream()
+                copressedBitmap.compress(Bitmap.CompressFormat.PNG,50,outputStream)
+                val byteArr=outputStream.toByteArray()
+
+                try{
+                    context?.let {
+
+                        val database=it.openOrCreateDatabase("Foods", Context.MODE_PRIVATE,null)
+                        database.execSQL("CREATE TABLE IF NOT EXISTS foods(id INTEGER PRIMARY KEY,foodName VARCHAR,foodIngredient VARCHAR,picture BLOB)")
+                        val sqlString="INSERT INTO foods (foodName,foodIngredient,picture) VALUES(?,?,?)"
+                        val statement=database.compileStatement(sqlString)
+                        statement.bindString(1,foodname)
+                        statement.bindString(2,foodIngredient)
+                        statement.bindBlob(3,byteArr)
+                        statement.execute()
+                    }
+
+
+
+                }
+                catch (e:Exception)
+                {
+                    e.printStackTrace()
+                }
+            val action =RecipeFragmentDirections.actionRecipeFragmentToListFragment()
+                Navigation.findNavController(view).navigate(action)
+
             }
         }
         fun pictureSelect()

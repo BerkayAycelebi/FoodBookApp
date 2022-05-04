@@ -15,6 +15,7 @@
         android:layout_height="181dp"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="21dp"
+        android:onClick="pictureSelect"
         android:src="@drawable/select"
         app:layout_constraintBottom_toTopOf="@+id/foodNameText"
         app:layout_constraintEnd_toEndOf="parent"

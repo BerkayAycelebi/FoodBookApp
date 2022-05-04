@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -46,6 +47,51 @@ class RecipeFragment : Fragment() {
 
         imageView.setOnClickListener {
             pictureSelect()
+        }
+
+        arguments?.let {
+            var comingInfo=RecipeFragmentArgs.fromBundle(it).info
+            if(comingInfo.equals("comefrommenu"))
+            {
+                foodNameText.setText("")
+                foodIngredientText.setText("")
+                button.visibility=View.VISIBLE
+                val pictureSelecteBackgroud=BitmapFactory.decodeResource(context?.resources,R.drawable.select)
+                imageView.setImageBitmap(pictureSelecteBackgroud)
+            }
+            else
+            { button.visibility=View.INVISIBLE
+                val selectedId=RecipeFragmentArgs.fromBundle(it).id
+
+                context?.let {
+
+                    try{
+                        val db=it.openOrCreateDatabase("Foods",Context.MODE_PRIVATE,null)
+                        val cursor =db.rawQuery("SELECT *  FROM foods WHERE id = ?", arrayOf(selectedId.toString()))
+                        val foodNameIndex=cursor.getColumnIndex("foodName")
+                        val foodIngredientIndex=cursor.getColumnIndex("foodIngredient")
+                        val foodPicture=cursor.getColumnIndex("picture")
+
+                        while(cursor.moveToNext())
+                        {
+                            foodNameText.setText(cursor.getString(foodNameIndex))
+                            foodIngredientText.setText(cursor.getString(foodIngredientIndex))
+
+                            var byteArr=cursor.getBlob(foodPicture)
+                            val bitmap=BitmapFactory.decodeByteArray(byteArr,0,byteArr.size)
+                            imageView.setImageBitmap(bitmap)
+                        }
+                        cursor.close()
+                    }
+                    catch (e:Exception)
+                    {
+                        e.printStackTrace()
+                    }
+
+
+                }
+
+            }
         }
     }
 

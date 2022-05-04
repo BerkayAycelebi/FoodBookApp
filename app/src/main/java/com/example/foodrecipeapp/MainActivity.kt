@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         if(item.itemId==R.id.food_add_item)
         {
             val action=ListFragmentDirections.actionListFragmentToRecipeFragment()
+            action.info="comefrommenu"
+            action.id=0
             Navigation.findNavController(this,R.id.fragmentContainerView).navigate(action)
         }
 

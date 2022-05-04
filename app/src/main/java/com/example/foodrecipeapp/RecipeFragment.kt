@@ -48,7 +48,12 @@ class RecipeFragment : Fragment() {
 
         fun save()
         {
-
+            val foodname=foodNameText.text.toString()
+            val foodIngredient=foodIngredientText.text.toString()
+            if(selectedBitmap!=null)
+            {
+                val copressedBitmap=compressBitmap(selectedBitmap!!,300,)
+            }
         }
         fun pictureSelect()
         {
@@ -116,5 +121,29 @@ class RecipeFragment : Fragment() {
 
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun compressBitmap(userSelectedBitmap:Bitmap,maxSize:Int):Bitmap
+    {    var width=userSelectedBitmap.width
+         var height=userSelectedBitmap.height
+         val bitmapRatio:Double=width.toDouble()/height.toDouble()
+        if(bitmapRatio>1)
+
+        {
+            width=maxSize
+            val compressHeight=width/bitmapRatio
+            height=compressHeight.toInt()
+
+        }
+        else
+        {
+            height=maxSize
+            val compressWidth=height*bitmapRatio
+            width=compressWidth.toInt()
+
+        }
+            return Bitmap.createScaledBitmap(userSelectedBitmap,width,height,true)
+
+
     }
 }
